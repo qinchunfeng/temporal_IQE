@@ -1,0 +1,42 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "iqe-v3/case-close",
+  "type": "object",
+  "required": ["schema_version", "incident_id", "verdict", "state", "evidence_dir", "metrics"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": { "const": "3.0" },
+    "incident_id": { "type": "string" },
+    "verdict": { "enum": ["reproduced", "flaky", "not_reproduced", "inconclusive", "skipped", "error"] },
+    "state": { "enum": ["closed", "dead"] },
+    "ticket_ref": { "type": "string" },
+    "evidence_dir": { "type": "string" },
+    "metrics": {
+      "type": "object",
+      "required": ["tat_seconds", "stages", "reruns_triggered"],
+      "additionalProperties": false,
+      "properties": {
+        "tat_seconds": { "type": "number" },
+        "stages": { "type": "object", "additionalProperties": { "type": "number" } },
+        "llm": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["role", "model"],
+            "additionalProperties": false,
+            "properties": {
+              "role": { "type": "string" },
+              "model": { "type": "string" },
+              "turns": { "type": ["integer", "null"] },
+              "input_tokens": { "type": ["integer", "null"] },
+              "output_tokens": { "type": ["integer", "null"] }
+            }
+          }
+        },
+        "reruns_triggered": { "type": "integer", "minimum": 0 },
+        "history_skip": { "type": "boolean" }
+      }
+    },
+    "lesson_ref": { "type": "string" }
+  }
+}

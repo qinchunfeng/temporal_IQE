@@ -1,0 +1,96 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "iqe-v3/slices",
+  "$defs": {
+    "triage": {
+      "type": "object",
+      "required": ["classification", "confidence", "summary", "qualifies_for_reproduction"],
+      "additionalProperties": false,
+      "properties": {
+        "classification": { "enum": ["driver", "test", "env", "infra", "code", "unknown"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+        "summary": { "type": "string" },
+        "suspected_root_cause": { "type": "string" },
+        "qualifies_for_reproduction": { "type": "boolean" }
+      }
+    },
+    "repro": {
+      "type": "object",
+      "required": ["verdict", "verdict_reason", "attempts", "failed_attempts", "signature_match_count", "reruns"],
+      "additionalProperties": false,
+      "properties": {
+        "verdict": { "enum": ["reproduced", "flaky", "not_reproduced", "inconclusive", "skipped", "error"] },
+        "verdict_reason": { "type": "string", "minLength": 1 },
+        "attempts": { "type": "integer", "minimum": 0 },
+        "failed_attempts": { "type": "integer", "minimum": 0 },
+        "signature_match_count": { "type": "integer", "minimum": 0 },
+        "rate": { "type": "number" },
+        "reruns": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["attempt", "run_ref", "state"],
+            "additionalProperties": false,
+            "properties": {
+              "attempt": { "type": "integer", "minimum": 1 },
+              "run_ref": { "type": "string" },
+              "state": { "enum": ["failed", "success", "running", "queued", "abandoned"] },
+              "signature_match": { "type": "boolean" },
+              "duration_seconds": { "type": "number" }
+            }
+          }
+        },
+        "abandoned_run_refs": { "type": "array", "items": { "type": "string" } },
+        "history_match": {
+          "type": "object",
+          "required": ["reused_case_id"],
+          "additionalProperties": false,
+          "properties": {
+            "reused_case_id": { "type": "string" },
+            "matched_at": { "type": "string" },
+            "original_verdict": { "type": "string" }
+          }
+        }
+      }
+    },
+    "ticket": {
+      "type": "object",
+      "required": ["draft"],
+      "additionalProperties": false,
+      "properties": {
+        "draft": {
+          "type": "object",
+          "required": ["title", "priority", "component"],
+          "additionalProperties": false,
+          "properties": {
+            "title": { "type": "string" },
+            "priority": { "enum": ["low", "medium", "high"] },
+            "component": { "type": "string" },
+            "assignee_hint": { "type": "string" }
+          }
+        },
+        "duplicate_of_case": { "type": ["string", "null"] },
+        "external_ticket_ref": { "type": "string" }
+      }
+    },
+    "review": {
+      "type": "object",
+      "required": ["decision", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "decision": { "enum": ["approve", "reject", "need_info"] },
+        "checks": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "diagnosis": { "type": "boolean" },
+            "evidence": { "type": "boolean" },
+            "reproducibility": { "type": "boolean" },
+            "duplicate": { "type": "boolean" }
+          }
+        },
+        "reason": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

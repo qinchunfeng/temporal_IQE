@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "iqe-v3/dispatch-decision",
+  "type": "object",
+  "required": ["action", "why"],
+  "additionalProperties": false,
+  "properties": {
+    "action": { "enum": ["dispatch", "skip", "ask"] },
+    "target_role": { "enum": ["triage", "repro", "ticket", "review", "reporting"] },
+    "skip_reason": { "type": "string" },
+    "why": { "type": "string", "minLength": 1 },
+    "refs": { "type": "array", "items": { "type": "string" } }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "action": { "const": "dispatch" } } },
+      "then": { "required": ["target_role"] }
+    },
+    {
+      "if": { "properties": { "action": { "const": "skip" } } },
+      "then": { "required": ["skip_reason", "refs"], "properties": { "refs": { "minItems": 1 } } }
+    }
+  ]
+}
